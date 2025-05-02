@@ -6,10 +6,15 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
+import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.core.content.getSystemService
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import kotlin.math.abs
@@ -23,11 +28,19 @@ class MotionDetector(private val context: Context) : ImageAnalysis.Analyzer {
     var motionSizeThreshold = 0.05f  // 0.0 to 1.0, percentage of changed pixels
     var motionSpeedThreshold = 500L  // milliseconds between detections
     
+    // Sound and vibration settings
+    private var soundEnabled = true
+    private var soundVolume = 0.8f  // 0.0 to 1.0
+    private var vibrationEnabled = true
+    
     // Optional ROI (Region of Interest)
     private var roi: Rect? = null
     
     // Motion detection state
     private var isMotionDetected = false
+    
+    // Vibrator service
+    private val vibrator: Vibrator? by lazy { context.getSystemService() }
     
     override fun analyze(imageProxy: ImageProxy) {
         val currentBitmap = imageProxyToBitmap(imageProxy)
@@ -43,8 +56,8 @@ class MotionDetector(private val context: Context) : ImageAnalysis.Analyzer {
                     lastDetectionTime = currentTime
                     isMotionDetected = true
                     
-                    // Play sound on motion detection
-                    playNotificationSound()
+                    // Play sound and vibrate on motion detection
+                    playNotification()
                 } else if (!motionDetected) {
                     isMotionDetected = false
                 }
@@ -152,6 +165,22 @@ class MotionDetector(private val context: Context) : ImageAnalysis.Analyzer {
         return changePercentage > motionSizeThreshold
     }
     
+    /**
+     * Play notification sound and vibrate when motion is detected
+     */
+    private fun playNotification() {
+        if (soundEnabled) {
+            playNotificationSound()
+        }
+        
+        if (vibrationEnabled) {
+            vibrate()
+        }
+    }
+    
+    /**
+     * Play notification sound with the configured volume
+     */
     private fun playNotificationSound() {
         try {
             if (mediaPlayer == null) {
@@ -163,24 +192,85 @@ class MotionDetector(private val context: Context) : ImageAnalysis.Analyzer {
                     mediaPlayer = MediaPlayer.create(context, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
                 }
                 
+                // Set audio attributes for proper audio focus handling
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mediaPlayer?.setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                }
+                
                 mediaPlayer?.setOnCompletionListener {
                     // Release resources when sound completes
                     it.release()
                     mediaPlayer = null
                 }
             }
+            
+            // Set volume
+            mediaPlayer?.setVolume(soundVolume, soundVolume)
             mediaPlayer?.start()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to play notification sound: ${e.message}", e)
         }
     }
     
+    /**
+     * Vibrate the device
+     */
+    private fun vibrate() {
+        vibrator?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                it.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                it.vibrate(500)
+            }
+        }
+    }
+    
+    /**
+     * Set region of interest for motion detection
+     */
     fun setRegionOfInterest(rect: Rect?) {
         this.roi = rect
     }
     
+    /**
+     * Check if motion is currently detected
+     */
     fun isMotionDetected(): Boolean {
         return isMotionDetected
+    }
+    
+    /**
+     * Enable or disable sound notifications
+     */
+    fun setSoundEnabled(enabled: Boolean) {
+        this.soundEnabled = enabled
+    }
+    
+    /**
+     * Set sound volume (0.0 to 1.0)
+     */
+    fun setSoundVolume(volume: Float) {
+        this.soundVolume = volume.coerceIn(0f, 1f)
+    }
+    
+    /**
+     * Enable or disable vibration
+     */
+    fun setVibrationEnabled(enabled: Boolean) {
+        this.vibrationEnabled = enabled
+    }
+    
+    /**
+     * Test notification sound and vibration
+     */
+    fun testNotification() {
+        playNotification()
     }
     
     companion object {

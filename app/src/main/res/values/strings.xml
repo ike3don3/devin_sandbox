@@ -10,4 +10,14 @@
     <string name="no_motion">No Motion</string>
     <string name="motion_detected">Motion Detected!</string>
     <string name="camera_started">Camera started</string>
+    
+    <!-- Settings categories -->
+    <string name="motion_detection_settings">Motion Detection Settings</string>
+    <string name="sound_settings">Sound Settings</string>
+    
+    <!-- Sound settings -->
+    <string name="enable_sound">Enable Sound</string>
+    <string name="sound_volume">Sound Volume</string>
+    <string name="enable_vibration">Enable Vibration</string>
+    <string name="test_sound">Test Sound</string>
 </resources>

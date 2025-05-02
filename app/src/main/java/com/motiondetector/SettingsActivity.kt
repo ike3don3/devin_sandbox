@@ -1,12 +1,19 @@
 package com.motiondetector
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Vibrator
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import com.motiondetector.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
+    private var soundEnabled = true
+    private var soundVolume = 0.8f // 0.0 to 1.0
+    private var vibrationEnabled = true
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +72,75 @@ class SettingsActivity : AppCompatActivity() {
         binding.drawRoiButton.setOnClickListener {
             // This will be implemented in a later step
             // It will open a dialog or activity to draw the ROI
+        }
+        
+        // Set up sound settings
+        
+        // Load saved sound settings
+        loadSoundSettings()
+        
+        // Initialize UI with saved settings
+        binding.soundEnabledSwitch.isChecked = soundEnabled
+        binding.soundVolumeSeekBar.progress = (soundVolume * 100).toInt()
+        binding.soundVolumeValue.text = "${binding.soundVolumeSeekBar.progress}%"
+        binding.vibrationEnabledSwitch.isChecked = vibrationEnabled
+        
+        // Update MotionDetector with current settings
+        motionDetector?.setSoundEnabled(soundEnabled)
+        motionDetector?.setSoundVolume(soundVolume)
+        motionDetector?.setVibrationEnabled(vibrationEnabled)
+        
+        // Set up sound enabled switch
+        binding.soundEnabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+            soundEnabled = isChecked
+            motionDetector?.setSoundEnabled(isChecked)
+            binding.soundVolumeSeekBar.isEnabled = isChecked
+            saveSoundSettings()
+        }
+        
+        // Set up sound volume seekbar
+        binding.soundVolumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.soundVolumeValue.text = "$progress%"
+                soundVolume = progress / 100f
+                motionDetector?.setSoundVolume(soundVolume)
+            }
+            
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                saveSoundSettings()
+            }
+        })
+        
+        // Set up vibration enabled switch
+        binding.vibrationEnabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+            vibrationEnabled = isChecked
+            motionDetector?.setVibrationEnabled(isChecked)
+            saveSoundSettings()
+        }
+        
+        // Set up test sound button
+        binding.testSoundButton.setOnClickListener {
+            motionDetector?.testNotification()
+            Toast.makeText(this, "Testing notification", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun loadSoundSettings() {
+        val prefs = getSharedPreferences("MotionDetectorPrefs", Context.MODE_PRIVATE)
+        soundEnabled = prefs.getBoolean("sound_enabled", true)
+        soundVolume = prefs.getFloat("sound_volume", 0.8f)
+        vibrationEnabled = prefs.getBoolean("vibration_enabled", true)
+    }
+    
+    private fun saveSoundSettings() {
+        val prefs = getSharedPreferences("MotionDetectorPrefs", Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putBoolean("sound_enabled", soundEnabled)
+            putFloat("sound_volume", soundVolume)
+            putBoolean("vibration_enabled", vibrationEnabled)
+            apply()
         }
     }
     
