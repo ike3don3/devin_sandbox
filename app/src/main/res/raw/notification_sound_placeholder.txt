@@ -1,0 +1,3 @@
+This is a placeholder for the notification sound file.
+In a real application, this would be replaced with an actual sound file (e.g., .mp3, .wav).
+For development purposes, you should add a real sound file named 'notification_sound.mp3' or similar in this directory.

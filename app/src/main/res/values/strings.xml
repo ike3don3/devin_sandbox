@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Motion Detector</string>
+    <string name="settings">Settings</string>
+    <string name="motion_size_threshold">Motion Size Threshold</string>
+    <string name="motion_speed_threshold">Motion Speed Threshold</string>
+    <string name="region_of_interest">Region of Interest</string>
+    <string name="draw_roi">Draw ROI</string>
+</resources>
