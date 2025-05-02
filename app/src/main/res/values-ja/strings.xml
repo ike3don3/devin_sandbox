@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">モーション検知</string>
+    <string name="settings">設定</string>
+    <string name="motion_size_threshold">動きの大きさのしきい値</string>
+    <string name="motion_speed_threshold">動きの速さのしきい値</string>
+    <string name="region_of_interest">関心領域</string>
+    <string name="draw_roi">ROIを描画</string>
+    <string name="pause">一時停止</string>
+    <string name="resume">再開</string>
+    <string name="no_motion">動きなし</string>
+    <string name="motion_detected">動きを検知しました！</string>
+    <string name="camera_started">カメラ起動</string>
+    
+    <!-- Settings categories -->
+    <string name="motion_detection_settings">動き検知設定</string>
+    <string name="sound_settings">音声設定</string>
+    
+    <!-- Sound settings -->
+    <string name="enable_sound">音を有効にする</string>
+    <string name="sound_volume">音量</string>
+    <string name="enable_vibration">振動を有効にする</string>
+    <string name="test_sound">音をテスト</string>
+    
+    <!-- ROI Drawing Activity -->
+    <string name="roi_drawing_instructions">動き検知の関心領域を定義する長方形を描画してください</string>
+    <string name="save">保存</string>
+    <string name="clear">クリア</string>
+    <string name="roi_saved">関心領域が保存されました</string>
+</resources>
