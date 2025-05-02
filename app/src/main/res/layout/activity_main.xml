@@ -11,6 +11,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Motion Status Indicator -->
+    <View
+        android:id="@+id/motionStatusIndicator"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/holo_green_light"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/motionStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/no_motion"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/motionStatusIndicator"
+        app:layout_constraintStart_toEndOf="@id/motionStatusIndicator"
+        app:layout_constraintTop_toTopOf="@id/motionStatusIndicator" />
+
+    <!-- Pause/Resume Button -->
+    <Button
+        android:id="@+id/pauseResumeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/pause"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/settingsButton"
         android:layout_width="wrap_content"

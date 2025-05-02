@@ -5,4 +5,9 @@
     <string name="motion_speed_threshold">Motion Speed Threshold</string>
     <string name="region_of_interest">Region of Interest</string>
     <string name="draw_roi">Draw ROI</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="no_motion">No Motion</string>
+    <string name="motion_detected">Motion Detected!</string>
+    <string name="camera_started">Camera started</string>
 </resources>

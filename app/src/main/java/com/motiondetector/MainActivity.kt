@@ -3,7 +3,11 @@ package com.motiondetector
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -20,6 +24,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var motionDetector: MotionDetector
+    private val handler = Handler(Looper.getMainLooper())
+    private var isDetectionActive = true
+
+    // Motion status check runnable
+    private val motionStatusChecker = object : Runnable {
+        override fun run() {
+            if (::motionDetector.isInitialized && isDetectionActive) {
+                updateMotionStatus(motionDetector.isMotionDetected())
+            }
+            handler.postDelayed(this, MOTION_CHECK_INTERVAL)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +58,42 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Initialize motion detector
-        motionDetector = MotionDetector(this)
+        motionDetector = (application as MotionDetectorApplication).motionDetector
 
         // Set up the executor for camera operations
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // Set up motion detection status indicator
+        binding.motionStatusIndicator.visibility = View.VISIBLE
+        updateMotionStatus(false)
+
+        // Set up pause/resume button
+        binding.pauseResumeButton.setOnClickListener {
+            toggleDetection()
+        }
+
+        // Start motion status checker
+        handler.post(motionStatusChecker)
+    }
+
+    private fun toggleDetection() {
+        isDetectionActive = !isDetectionActive
+        binding.pauseResumeButton.text = if (isDetectionActive) getString(R.string.pause) else getString(R.string.resume)
+        binding.motionStatusIndicator.visibility = if (isDetectionActive) View.VISIBLE else View.INVISIBLE
+        
+        if (!isDetectionActive) {
+            // Reset motion status when paused
+            updateMotionStatus(false)
+        }
+    }
+
+    private fun updateMotionStatus(motionDetected: Boolean) {
+        binding.motionStatusIndicator.setBackgroundColor(
+            if (motionDetected) Color.RED else Color.GREEN
+        )
+        binding.motionStatusText.text = getString(
+            if (motionDetected) R.string.motion_detected else R.string.no_motion
+        )
     }
 
     private fun startCamera() {
@@ -82,6 +130,8 @@ class MainActivity : AppCompatActivity() {
                     this, cameraSelector, preview, imageAnalyzer
                 )
 
+                Toast.makeText(this, getString(R.string.camera_started), Toast.LENGTH_SHORT).show()
+
             } catch (exc: Exception) {
                 Toast.makeText(this, "Failed to start camera: ${exc.message}", 
                     Toast.LENGTH_SHORT).show()
@@ -113,13 +163,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Resume motion status checker
+        handler.post(motionStatusChecker)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Remove motion status checker callbacks
+        handler.removeCallbacks(motionStatusChecker)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        // Remove motion status checker callbacks
+        handler.removeCallbacks(motionStatusChecker)
         cameraExecutor.shutdown()
     }
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val MOTION_CHECK_INTERVAL = 100L // milliseconds
     }
 }
