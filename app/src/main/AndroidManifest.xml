@@ -3,6 +3,7 @@
     package="com.motiondetector">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -26,6 +27,10 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".RoiDrawingActivity"
+            android:exported="false"
+            android:parentActivityName=".SettingsActivity" />
     </application>
 
 </manifest>

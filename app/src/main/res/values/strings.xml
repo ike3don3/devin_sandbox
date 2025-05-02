@@ -20,4 +20,10 @@
     <string name="sound_volume">Sound Volume</string>
     <string name="enable_vibration">Enable Vibration</string>
     <string name="test_sound">Test Sound</string>
+    
+    <!-- ROI Drawing Activity -->
+    <string name="roi_drawing_instructions">Draw a rectangle to define the region of interest for motion detection</string>
+    <string name="save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="roi_saved">Region of interest saved</string>
 </resources>

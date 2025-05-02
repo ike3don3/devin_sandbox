@@ -70,8 +70,9 @@ class SettingsActivity : AppCompatActivity() {
         
         // Set up the draw ROI button
         binding.drawRoiButton.setOnClickListener {
-            // This will be implemented in a later step
-            // It will open a dialog or activity to draw the ROI
+            // Launch the ROI drawing activity
+            val intent = RoiDrawingActivity.newIntent(this)
+            startActivity(intent)
         }
         
         // Set up sound settings
