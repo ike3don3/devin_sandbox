@@ -2,6 +2,9 @@
 
 An Android application that detects motion using the device camera, plays a sound when movement is detected, and allows users to customize motion size and speed thresholds from a settings screen. The app also supports defining a Region of Interest (ROI) to limit the detection area.
 
+## Overview
+This implementation provides a complete, production-ready motion detection solution for Android devices with comprehensive features and optimized performance.
+
 ![Motion Detector App](app/src/main/res/drawable/app_screenshot.png)
 
 ## Features
